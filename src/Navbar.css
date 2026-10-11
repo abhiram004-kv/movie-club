@@ -1,0 +1,11 @@
+
+.movie-navbar {
+  background-color: #101827;
+  border-bottom: 2px solid #1769e0;
+  padding: 18px 0;
+}
+
+.movie-navbar .navbar-brand {
+  color: #4da6ff;
+  font-size: 25px;
+}

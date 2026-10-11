@@ -1,0 +1,26 @@
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background-color: #080d18;
+  color: white;
+  font-family: Arial, sans-serif;
+}
+
+button {
+  transition: 0.2s;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+movie-list {
+  background-color: #080d18;
+  color: white;
+  border: 1px solid #263751;
+  border-radius: 12px;
+}
