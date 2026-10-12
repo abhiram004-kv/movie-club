@@ -3,7 +3,7 @@ const express = require('express')
 const router = express.Router()
 const User = require('../models/User')
 
-
+// Register normal user
 router.post('/register', async (req, res) => {
   try {
     const { name, email, password } = req.body
@@ -19,14 +19,20 @@ router.post('/register', async (req, res) => {
     const user = new User({
       name,
       email,
-      password
+      password,
+      role: 'user'
     })
 
     await user.save()
 
-    res.json({ message: 'Registration successful' })
+    res.json({
+      message: 'Registration successful'
+    })
   } catch (err) {
-    res.status(500).json({ message: 'Server error' })
+    console.log(err)
+    res.status(500).json({
+      message: 'Server error'
+    })
   }
 })
 
@@ -43,9 +49,15 @@ router.post('/login', async (req, res) => {
       })
     }
 
-    res.json({ message: 'Login successful' })
+    res.json({
+      message: 'Login successful',
+      role: user.role
+    })
   } catch (err) {
-    res.status(500).json({ message: 'Server error' })
+    console.log(err)
+    res.status(500).json({
+      message: 'Server error'
+    })
   }
 })
 
