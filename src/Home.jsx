@@ -8,17 +8,22 @@ function Home({ onMovieClick }) {
   const [search, setSearch] = useState('')
   const [selectedLanguage, setSelectedLanguage] = useState('All')
 
-  useEffect(() => {
-    fetch(`${API_URL}/movies`)
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Failed to load movies')
-        }
-        return response.json()
-      })
-      .then(data => setMovies(data))
-      .catch(error => console.log(error))
-  }, [])
+useEffect(() => {
+  fetch(`${API_URL}/movies`)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Failed to load movies')
+      }
+      return response.json()
+    })
+    .then(data => {
+      console.log('Movies:', data)
+      setMovies(data)
+    })
+    .catch(error => {
+      console.log('Movie fetch error:', error)
+    })
+}, [])
 
   const filteredMovies = movies.filter((movie) => {
     const matchSearch = movie.name
