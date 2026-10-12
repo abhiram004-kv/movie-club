@@ -39,8 +39,8 @@ async function handleSubmit(e) {
 
     alert(result.message)
 
-    if (isLogin) {
-      onLogin()
+      if (isLogin) {
+      onLogin(result.role)
     } else {
       setIsLogin(true)
       setName('')

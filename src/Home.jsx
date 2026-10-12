@@ -1,10 +1,24 @@
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import API_URL from './api.jsx'
 import './Home.css'
 
-function Home({ movies, onMovieClick }) {
+function Home({ onMovieClick }) {
+  const [movies, setMovies] = useState([])
   const [search, setSearch] = useState('')
   const [selectedLanguage, setSelectedLanguage] = useState('All')
+
+  useEffect(() => {
+    fetch(`${API_URL}/movies`)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Failed to load movies')
+        }
+        return response.json()
+      })
+      .then(data => setMovies(data))
+      .catch(error => console.log(error))
+  }, [])
 
   const filteredMovies = movies.filter((movie) => {
     const matchSearch = movie.name
@@ -52,8 +66,8 @@ function Home({ movies, onMovieClick }) {
       <h2 className="section-title mb-4">Movies</h2>
 
       <div className="row g-4">
-        {filteredMovies.map((movie, index) => (
-          <div className="col-6 col-md-4 col-lg-3" key={movie.name}>
+        {filteredMovies.map((movie) => (
+          <div className="col-6 col-md-4 col-lg-3" key={movie._id || movie.name}>
             <div
               className="card movie-card h-100"
               onClick={() => onMovieClick(movie)}
@@ -70,7 +84,13 @@ function Home({ movies, onMovieClick }) {
                 <p className="card-text">Genre: {movie.genre}</p>
                 <p className="card-text">Language: {movie.language}</p>
 
-                <button className="btn btn-primary w-100">
+                <button
+                  className="btn btn-primary w-100"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    onMovieClick(movie)
+                  }}
+                >
                   View Details
                 </button>
               </div>

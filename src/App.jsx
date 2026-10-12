@@ -4,10 +4,12 @@ import Navbar from './Navbar'
 import Home from './Home'
 import MovieDetails from './MovieDetails'
 import Login from './Login'
+import AdminDashboard from './AdminDashboard'
 
 function App() {
-  const [selectedMovie, setSelectedMovie] = useState(null)
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
+const [selectedMovie, setSelectedMovie] = useState(null)
+const [isLoggedIn, setIsLoggedIn] = useState(false)
+const [role, setRole] = useState('')
 
   const movies = [
     {
@@ -119,24 +121,32 @@ function App() {
       story: "A biographical drama about an Indian Army officer."
     }
   ]
-  if (!isLoggedIn) {
-  return <Login onLogin={() => setIsLoggedIn(true)} />
+if (!isLoggedIn) {
+  return (
+    <Login
+      onLogin={(userRole) => {
+        setIsLoggedIn(true)
+        setRole(userRole)
+      }}
+    />
+  )
 }
   return (
     <div>
       <Navbar />
 
-      {selectedMovie ? (
-        <MovieDetails
-          movie={selectedMovie}
-          onBack={() => setSelectedMovie(null)}
-        />
-      ) : (
-        <Home
-          movies={movies}
-          onMovieClick={setSelectedMovie}
-        />
-      )}
+
+    {role === 'admin' ? (
+      <AdminDashboard />
+    ) : selectedMovie ? (
+      <MovieDetails
+        movie={selectedMovie}
+        onBack={() => setSelectedMovie(null)}
+      />
+    ) : (
+    <Home onMovieClick={setSelectedMovie} />
+    )}
+
     </div>
   )
 }
