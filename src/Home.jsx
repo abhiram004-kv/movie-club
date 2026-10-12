@@ -3,8 +3,8 @@ import { useState, useEffect } from 'react'
 import API_URL from './api.jsx'
 import './Home.css'
 
-function Home({ onMovieClick }) {
-  const [movies, setMovies] = useState([])
+function Home({ onMovieClick , initialMovies = []}) {
+  const [movies, setMovies] = useState(initialMovies)
   const [search, setSearch] = useState('')
   const [selectedLanguage, setSelectedLanguage] = useState('All')
 
@@ -17,13 +17,13 @@ useEffect(() => {
       return response.json()
     })
     .then(data => {
-      console.log('Movies:', data)
-      setMovies(data)
+      setMovies([...initialMovies, ...data])
     })
     .catch(error => {
-      console.log('Movie fetch error:', error)
+      console.log(error)
+      setMovies(initialMovies)
     })
-}, [])
+}, [initialMovies])
 
   const filteredMovies = movies.filter((movie) => {
     const matchSearch = movie.name

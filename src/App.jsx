@@ -144,7 +144,10 @@ if (!isLoggedIn) {
         onBack={() => setSelectedMovie(null)}
       />
     ) : (
-    <Home onMovieClick={setSelectedMovie} />
+<Home
+  onMovieClick={setSelectedMovie}
+  initialMovies={movies}
+/>
     )}
 
     </div>
