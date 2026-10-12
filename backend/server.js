@@ -1,3 +1,7 @@
+require('dotenv').config();
+
+const dns = require('dns');
+dns.setServers(['8.8.8.8']);
 
 const express = require('express')
 const mongoose = require('mongoose')
@@ -8,7 +12,7 @@ const app = express()
 app.use(cors())
 app.use(express.json())
 
-mongoose.connect('mongodb://127.0.0.1:27017/MovieClub')
+mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log('MongoDB Connected'))
   .catch((err) => console.log(err))
 
