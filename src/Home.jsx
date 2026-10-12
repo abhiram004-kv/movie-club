@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react'
 import API_URL from './api.jsx'
 import './Home.css'
 
-function Home({ onMovieClick , initialMovies = []}) {
+function Home({ onMovieClick , initialMovies = [] }) {
   const [movies, setMovies] = useState(initialMovies)
   const [search, setSearch] = useState('')
   const [selectedLanguage, setSelectedLanguage] = useState('All')
@@ -23,7 +23,7 @@ useEffect(() => {
       console.log(error)
       setMovies(initialMovies)
     })
-}, [initialMovies])
+}, [])
 
   const filteredMovies = movies.filter((movie) => {
     const matchSearch = movie.name
