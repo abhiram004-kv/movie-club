@@ -1,6 +1,7 @@
 
 import { useState } from 'react'
 import './Login.css'
+import API_URL from "./api.jsx";
 
 function Login({ onLogin }) {
   const [isLogin, setIsLogin] = useState(true)
@@ -12,9 +13,9 @@ function Login({ onLogin }) {
 async function handleSubmit(e) {
   e.preventDefault()
 
-  const url = isLogin
-    ? 'http://localhost:5000/user/login'
-    : 'http://localhost:5000/user/register'
+    const url = isLogin
+      ? `${API_URL}/user/login`
+      : `${API_URL}/user/register`
 
   const data = isLogin
     ? { email, password }
@@ -47,7 +48,8 @@ async function handleSubmit(e) {
       setPassword('')
     }
   } catch (error) {
-    alert('Backend connect aayittilla!')
+    console.error('Login error:', error)
+    alert('Error: ' + error.message)
   }
 }
 
