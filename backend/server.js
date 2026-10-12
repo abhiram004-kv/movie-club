@@ -22,6 +22,8 @@ mongoose.connect(process.env.MONGODB_URI)
 
 const userRoutes = require('./routes/userRoutes');
 app.use('/user', userRoutes);
+const movieRoutes = require('./routes/movieRoutes')
+app.use('/movies', movieRoutes)
 
 app.get('/', (req, res) => {
   res.send('Movie Club Backend Running');
