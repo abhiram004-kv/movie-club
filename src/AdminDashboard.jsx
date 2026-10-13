@@ -1,100 +1,244 @@
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import API_URL from './api.jsx'
 
-
 function AdminDashboard() {
-  const [name, setName] = useState('')
-  const [image, setImage] = useState('')
-  const [rating, setRating] = useState('')
-  const [year, setYear] = useState('')
-  const [genre, setGenre] = useState('')
-  const [language, setLanguage] = useState('')
-  const [story, setStory] = useState('')
-
- 
-async function addMovie(e) {
-  e.preventDefault()
-
-  const movie = {
-    name, image, rating, year, genre, language, story
+  const emptyMovie = {
+    name: '',
+    image: '',
+    rating: '',
+    year: '',
+    genre: '',
+    language: '',
+    story: ''
   }
 
-  try {
-    const response = await fetch(`${API_URL}/movies/add`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(movie)
+  const [form, setForm] = useState(emptyMovie)
+  const [movies, setMovies] = useState([])
+  const [editId, setEditId] = useState(null)
+
+  async function loadMovies() {
+    try {
+      const response = await fetch(`${API_URL}/movies`)
+      const data = await response.json()
+
+      if (response.ok) {
+        setMovies(data)
+      }
+    } catch (error) {
+      console.log('Load error:', error)
+    }
+  }
+
+  useEffect(() => {
+    loadMovies()
+  }, [])
+
+  function handleChange(e) {
+    setForm({
+      ...form,
+      [e.target.name]: e.target.value
+    })
+  }
+
+  async function saveMovie(e) {
+    e.preventDefault()
+
+    const url = editId
+      ? `${API_URL}/movies/${editId}`
+      : `${API_URL}/movies/add`
+
+    try {
+      const response = await fetch(url, {
+        method: editId ? 'PUT' : 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(form)
+      })
+
+      const result = await response.json()
+
+      if (!response.ok) {
+        alert(result.message || 'Something went wrong')
+        return
+      }
+
+      alert(editId ? 'Movie updated!' : 'Movie added!')
+
+      setForm(emptyMovie)
+      setEditId(null)
+      loadMovies()
+    } catch (error) {
+      console.log(error)
+      alert('Connection error')
+    }
+  }
+
+  function editMovie(movie) {
+    setForm({
+      name: movie.name || '',
+      image: movie.image || '',
+      rating: movie.rating || '',
+      year: movie.year || '',
+      genre: movie.genre || '',
+      language: movie.language || '',
+      story: movie.story || ''
     })
 
-    const result = await response.json()
+    setEditId(movie._id)
+    window.scrollTo(0, 0)
+  }
 
-    if (!response.ok) {
-      alert('Error: ' + (result.message || response.status))
+  async function deleteMovie(id) {
+    if (!window.confirm('Are you sure you want to delete this movie?')) {
       return
     }
 
-    alert('Movie added successfully!')
+    try {
+      const response = await fetch(`${API_URL}/movies/${id}`, {
+        method: 'DELETE'
+      })
 
-    setName('')
-    setImage('')
-    setRating('')
-    setYear('')
-    setGenre('')
-    setLanguage('')
-    setStory('')
+      const result = await response.json()
 
-  } catch (error) {
-    console.error('Add movie error:', error)
-    alert('Connection error. Check browser Console (F12).')
+      if (!response.ok) {
+        alert(result.message || 'Delete failed')
+        return
+      }
+
+      alert('Movie deleted!')
+      loadMovies()
+    } catch (error) {
+      console.log(error)
+      alert('Connection error')
+    }
   }
-}
+
+  function cancelEdit() {
+    setForm(emptyMovie)
+    setEditId(null)
+  }
 
   return (
     <div className="container py-5">
       <h2>Admin Dashboard</h2>
-      <p>Add a new movie to Movie Club.</p>
+      <p>Add, edit or remove movies from Movie Club.</p>
 
-      <form onSubmit={addMovie}>
-        <input className="form-control mb-3"
-          placeholder="Movie name" value={name}
-          onChange={e => setName(e.target.value)} required />
+      <form onSubmit={saveMovie}>
+        <input
+          className="form-control mb-3"
+          name="name"
+          placeholder="Movie name"
+          value={form.name}
+          onChange={handleChange}
+          required
+        />
 
-        <input className="form-control mb-3"
-          placeholder="Image URL" value={image}
-          onChange={e => setImage(e.target.value)} required />
+        <input
+          className="form-control mb-3"
+          name="image"
+          placeholder="Image URL"
+          value={form.image}
+          onChange={handleChange}
+          required
+        />
 
-        <input className="form-control mb-3"
-          placeholder="Rating" value={rating}
-          onChange={e => setRating(e.target.value)} required />
+        <input
+          className="form-control mb-3"
+          name="rating"
+          placeholder="Rating"
+          value={form.rating}
+          onChange={handleChange}
+          required
+        />
 
-        <input className="form-control mb-3"
-          placeholder="Year" value={year}
-          onChange={e => setYear(e.target.value)} required />
+        <input
+          className="form-control mb-3"
+          name="year"
+          placeholder="Year"
+          value={form.year}
+          onChange={handleChange}
+          required
+        />
 
-        <input className="form-control mb-3"
-          placeholder="Genre" value={genre}
-          onChange={e => setGenre(e.target.value)} required />
+        <input
+          className="form-control mb-3"
+          name="genre"
+          placeholder="Genre"
+          value={form.genre}
+          onChange={handleChange}
+          required
+        />
 
-        <select className="form-select mb-3"
-          value={language}
-          onChange={e => setLanguage(e.target.value)} required>
+        <select
+          className="form-select mb-3"
+          name="language"
+          value={form.language}
+          onChange={handleChange}
+          required
+        >
           <option value="">Select language</option>
           <option>English</option>
           <option>Malayalam</option>
           <option>Tamil</option>
         </select>
 
-        <textarea className="form-control mb-3"
-          placeholder="Movie story" value={story}
-          onChange={e => setStory(e.target.value)} required />
+        <textarea
+          className="form-control mb-3"
+          name="story"
+          placeholder="Movie story"
+          value={form.story}
+          onChange={handleChange}
+          required
+        />
 
-        <button className="btn btn-primary" type="submit">
-          Add Movie
+        <button className="btn btn-primary me-2" type="submit">
+          {editId ? 'Update Movie' : 'Add Movie'}
         </button>
+
+        {editId && (
+          <button
+            className="btn btn-secondary"
+            type="button"
+            onClick={cancelEdit}
+          >
+            Cancel
+          </button>
+        )}
       </form>
+
+      <hr className="my-5" />
+
+      <h3>Manage Movies</h3>
+
+      <div className="row g-4 mt-2">
+        {movies.map(movie => (
+          <div className="col-12 col-md-6 col-lg-4" key={movie._id}>
+            <div className="card h-100">
+              <div className="card-body">
+                <h5 className="card-title">{movie.name}</h5>
+                <p>Language: {movie.language}</p>
+                <p>Rating: {movie.rating}</p>
+
+                <button
+                  className="btn btn-warning me-2"
+                  onClick={() => editMovie(movie)}
+                >
+                  Edit
+                </button>
+
+                <button
+                  className="btn btn-danger"
+                  onClick={() => deleteMovie(movie._id)}
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   )
 }
