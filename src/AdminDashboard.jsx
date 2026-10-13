@@ -16,6 +16,7 @@ function AdminDashboard() {
   const [form, setForm] = useState(emptyMovie)
   const [movies, setMovies] = useState([])
   const [editId, setEditId] = useState(null)
+  const [suggestions, setSuggestions] = useState([])
 
   async function loadMovies() {
     try {
@@ -29,9 +30,22 @@ function AdminDashboard() {
       console.log('Load error:', error)
     }
   }
+  async function loadSuggestions() {
+  try {
+    const response = await fetch(`${API_URL}/suggestions/pending`)
+    const data = await response.json()
+
+    if (response.ok) {
+      setSuggestions(data)
+    }
+  } catch (error) {
+    console.log('Suggestion load error:', error)
+  }
+}
 
   useEffect(() => {
     loadMovies()
+    loadSuggestions()
   }, [])
 
   function handleChange(e) {
@@ -119,6 +133,40 @@ function AdminDashboard() {
     setForm(emptyMovie)
     setEditId(null)
   }
+  async function reviewSuggestion(id, action) {
+  const message = action === 'approve'
+    ? 'Approve this movie suggestion?'
+    : 'Reject this movie suggestion?'
+
+  if (!window.confirm(message)) {
+    return
+  }
+
+  try {
+    const response = await fetch(
+      `${API_URL}/suggestions/${action}/${id}`,
+      { method: 'PUT' }
+    )
+
+    const result = await response.json()
+
+    if (!response.ok) {
+      alert(result.message || 'Something went wrong')
+      return
+    }
+
+    alert(result.message)
+
+    loadSuggestions()
+
+    if (action === 'approve') {
+      loadMovies()
+    }
+  } catch (error) {
+    console.log(error)
+    alert('Connection error')
+  }
+}
 
   return (
     <div className="container py-5">
@@ -207,6 +255,60 @@ function AdminDashboard() {
           </button>
         )}
       </form>
+      
+<hr className="my-5" />
+
+<h3>User Movie Suggestions</h3>
+<p>Review suggestions submitted by users.</p>
+
+<div className="row g-4 mt-2">
+  {suggestions.length === 0 ? (
+    <div className="col-12">
+      <p>No pending suggestions.</p>
+    </div>
+  ) : (
+    suggestions.map(movie => (
+      <div className="col-12 col-md-6 col-lg-4" key={movie._id}>
+        <div className="card h-100">
+          <img
+            src={movie.image}
+            className="card-img-top"
+            alt={movie.name}
+            style={{ height: '250px', objectFit: 'cover' }}
+          />
+
+          <div className="card-body">
+            <h5 className="card-title">{movie.name}</h5>
+            <p>Language: {movie.language}</p>
+            <p>Year: {movie.year}</p>
+            <p>Rating: {movie.rating}</p>
+            <p>Genre: {movie.genre}</p>
+            <p>Reason: {movie.reason || 'Not provided'}</p>
+            <span className="badge text-bg-warning mb-3">
+              Pending
+            </span>
+
+            <div>
+              <button
+                className="btn btn-success me-2"
+                onClick={() => reviewSuggestion(movie._id, 'approve')}
+              >
+                Approve
+              </button>
+
+              <button
+                className="btn btn-danger"
+                onClick={() => reviewSuggestion(movie._id, 'reject')}
+              >
+                Reject
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    ))
+  )}
+</div>
 
       <hr className="my-5" />
 

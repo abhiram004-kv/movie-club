@@ -10,7 +10,6 @@ const cors = require('cors');
 
 const app = express();
 
-
 app.use(cors({
   origin: [
     'http://localhost:5173',
@@ -19,18 +18,26 @@ app.use(cors({
   ]
 }));
 
-
 app.use(express.json());
 
+// Connect MongoDB
 mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log('MongoDB Connected'))
   .catch((err) => console.log('MongoDB Error:', err.message));
 
+// User routes
 const userRoutes = require('./routes/userRoutes');
 app.use('/user', userRoutes);
-const movieRoutes = require('./routes/movieRoutes')
-app.use('/movies', movieRoutes)
 
+// Movie routes
+const movieRoutes = require('./routes/movieRoutes');
+app.use('/movies', movieRoutes);
+
+// Suggestion routes
+const suggestionRoutes = require('./routes/suggestionRoutes');
+app.use('/suggestions', suggestionRoutes);
+
+// Test backend
 app.get('/', (req, res) => {
   res.send('Movie Club Backend Running');
 });

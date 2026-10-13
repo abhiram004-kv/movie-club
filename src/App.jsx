@@ -5,11 +5,13 @@ import Home from './Home'
 import MovieDetails from './MovieDetails'
 import Login from './Login'
 import AdminDashboard from './AdminDashboard'
+import SuggestMovies from './SuggestMovies'
 
 function App() {
-const [selectedMovie, setSelectedMovie] = useState(null)
-const [isLoggedIn, setIsLoggedIn] = useState(false)
-const [role, setRole] = useState('')
+  const [selectedMovie, setSelectedMovie] = useState(null)
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [role, setRole] = useState('')
+  const [showSuggestion, setShowSuggestion] = useState(false)
 
   const movies = [
     {
@@ -121,35 +123,59 @@ const [role, setRole] = useState('')
       story: "A biographical drama about an Indian Army officer."
     }
   ]
-if (!isLoggedIn) {
-  return (
-    <Login
-      onLogin={(userRole) => {
-        setIsLoggedIn(true)
-        setRole(userRole)
-      }}
-    />
-  )
-}
+
+  if (!isLoggedIn) {
+    return (
+      <Login
+        onLogin={(userRole) => {
+          setIsLoggedIn(true)
+          setRole(userRole)
+        }}
+      />
+    )
+  }
+
   return (
     <div>
       <Navbar />
 
+      {role === 'admin' ? (
+        <AdminDashboard />
+      ) : showSuggestion ? (
+        <div>
+          <div className="container pt-3">
+            <button
+              className="btn btn-secondary"
+              onClick={() => setShowSuggestion(false)}
+            >
+              Back to Home
+            </button>
+          </div>
 
-    {role === 'admin' ? (
-      <AdminDashboard />
-    ) : selectedMovie ? (
-      <MovieDetails
-        movie={selectedMovie}
-        onBack={() => setSelectedMovie(null)}
-      />
-    ) : (
-<Home
-  onMovieClick={setSelectedMovie}
-  initialMovies={movies}
-/>
-    )}
+          <SuggestMovies />
+        </div>
+      ) : selectedMovie ? (
+        <MovieDetails
+          movie={selectedMovie}
+          onBack={() => setSelectedMovie(null)}
+        />
+      ) : (
+        <div>
+          <div className="container pt-3">
+            <button
+              className="btn btn-primary"
+              onClick={() => setShowSuggestion(true)}
+            >
+              Suggest a Movie
+            </button>
+          </div>
 
+          <Home
+            onMovieClick={setSelectedMovie}
+            initialMovies={movies}
+          />
+        </div>
+      )}
     </div>
   )
 }
